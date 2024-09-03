@@ -1,12 +1,12 @@
-### Go to AWS Management console and Create an Ubuntu Ec2 instance
+# Cloud Cost Optimization
 
-Go to Snapshot
+### Go to AWS Management console
 
-Create Snapshot using default volume
+Create an Ubuntu Ec2 instance and sure instance is active and running
 
-#### Make sure all are running and Active
+Go to Snapshot and create Snapshot using created instance
 
-### Go to Lambda console
+## Go to Lambda console
 
 Create lambda function
 
