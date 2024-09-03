@@ -1,26 +1,24 @@
 # Cloud Cost Optimization
 
-### Go to AWS Management console
+### AWS Management console
 
-Create an Ubuntu Ec2 instance and sure instance is active and running
+Create an Ubuntu Ec2 instance and make sure instance is active and running
 
-Go to Snapshot and create Snapshot using created instance
+Go to Snapshot and create Snapshot using volume
 
-## Go to Lambda console
+## Lambda console
 
 Create lambda function
 
 Choose Author from scratch
 
 `Function name` - cost-optimization-ebs-snapshot
+
 `Runtime` - python3.12
 
-click Create function
+Click create function
 
-Function overview 
-
-Code
-
+Go to Code Option and paste this boto3 python code
 
 ```
 import boto3
@@ -62,21 +60,21 @@ def lambda_handler(event, context):
                     print(f"Deleted EBS snapshot {snapshot_id} as its associated volume was not found.")
 ```
 
-click on Test
+Click on Test
 
 #### Configure Event
 
 `Event Name` - test-event
+
 `Event sharing settings` - Private
+
 Save it
 
-you do it manully that we if you do it using cloud watch then you don't create test event
+We do this manully, if you do it using cloud watch then you don't create test event
 
-deploy then test again
+Deploy then test again, it will fail because bydefault **lambda execution time 3sec** and it is failing due to some permission issue.
 
-now it will fail bydefault lambda execution time 3sec and it is failing soame permission issue
-
-Output
+Output:
 ```
 Test Event Name
 test-event
@@ -95,13 +93,15 @@ REPORT RequestId: 105b7351-cb9a-46a2-ad59-f79ae25e30f0	Duration: 3000.00 ms	Bill
 Request ID
 105b7351-cb9a-46a2-ad59-f79ae25e30f0
 ```
-configuration to general configuration
+Go to configuration then general configuration
 
-default execution is 3 sec change it 10 sec
+Default execution is 3 sec and set this 3 sec to 10 sec and save it
 
-save it and depoloy and test
+It is better to keep the execution time as small as possible because aws will charge you using this as a parameter like the lambda execution time is also one of the parameter for charging so make sure that you keep this time as less as possible.
 
-Output:
+Again save, deploy and test
+
+Output should look like:
 
 ```
 Test Event Name
@@ -124,32 +124,19 @@ START RequestId: 6478857b-b34a-414b-b4ae-4b98d250e353 Version: $LATEST
 LAMBDA_WARNING: Unhandled exception. The most likely cause is an issue in the function code. However, in rare cases, a Lambda runtime update can cause unexpected function behavior. For functions using managed runtimes, runtime updates can be triggered by a function change, or can be applied automatically. To determine if the runtime has been updated, check the runtime version in the INIT_START log entry. If this error correlates with a change in the runtime version, you may be able to mitigate this error by temporarily rolling back to the previous runtime version. For more information, see https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html
 [ERROR] ClientError: An error occurred (UnauthorizedOperation) when calling the DescribeSnapshots operation: You are not authorized to perform this operation. User: arn:aws:sts::140146403711:assumed-role/cost-optimization-ebs-snapshot-role-lhvdh5v5/cost-optimization-ebs-snapshot is not authorized to perform: ec2:DescribeSnapshots because no identity-based policy allows the ec2:DescribeSnapshots action
 ```
+Go to code -----> configuration ----> permission -----> Rolename ----> Go to new tab 
 
+Policy ---> create policy ---> choose service ---> ec2 ---> search
 
+Add actions:- describe snapshot, describe instance, describe volumes
 
-it is better to keep the execution time as small as possibel because aws will charge you using this as a parameter like the lambda execution time is also one of the parameter for charging so make sure that you keep this time as less as possible
+Resources ARN ---> all
 
-Go to code 
-go to configuration
-go to permission 
-rolename go to new tab
-add permission to it
-new tab
-policy
-create policy
-choose service 
-ec2
-add
-delete snapshot
-describe snapshot
-describe instance 
-describe volumes
-resources ARN --- all
-Give the policy name
-cost-optimization-policy
-search policy name select attach
-save the code deploy and test
-Output
+Give the policy name --> cost-optimization-policy
+
+Search policy name and select then attach and save the code, deploy and test
+
+Output should look like
 ```
 Test Event Name
 test-event
@@ -166,10 +153,12 @@ Request ID
 770c9765-6cc8-4afd-b78a-c9b9bfdb097a
 ```
 
-manually delete ec2 instance make sure instance and volume is deleted
+Now, manually delete the ec2 instance and make sure instance and volume is deleted
 
-save code deploy and test
-output:
+Save the code deploy and test
+
+Output should look like:
+
 ```
 Test Event Name
 test-event
@@ -202,12 +191,13 @@ REPORT RequestId: 262d9b90-8c48-4a8f-b07f-c487f5e221e1	Duration: 4744.95 ms	Bill
 Request ID
 262d9b90-8c48-4a8f-b07f-c487f5e221e1
 ```
-add delete snapshot in iam policy
-policy--->cost-optimization-policy---->permissions--->edit---->visual--->ec2---->search--->delete snapshot---->next---->savechanges
+Add "delete snapshot" action in iam policy
 
-again test
+Policy ---> select cost-optimization-policy ---> permissions ---> edit --> visual --> ec2 --> search --> delete snapshot --> next --> save changes
 
-Output:
+Again deploy and test
+
+Output should look like:
 ```
 Test Event Name
 test-event
@@ -224,5 +214,7 @@ REPORT RequestId: 13d2e237-72b0-4504-979b-8250bb699293	Duration: 4694.69 ms	Bill
 Request ID
 13d2e237-72b0-4504-979b-8250bb699293
 ```
+#### EBS snapshot is deleted because there is no associated volume was found
 
+#### Congratulations!!!
 
